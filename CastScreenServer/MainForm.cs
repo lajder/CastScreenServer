@@ -17,6 +17,7 @@ namespace CastScreenServer
     {
         public static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
+        private bool _isStarted;
         private object _locker = new object();
         private ReaderWriterLock _rwLocker = new ReaderWriterLock();
         private MemoryStream _capturedScreen = new MemoryStream();
@@ -37,25 +38,60 @@ namespace CastScreenServer
             NLog.LogManager.Shutdown();
         }
 
-        private void btnStartStop_ClickAsync(object sender, EventArgs e)
+        private async void btnStartStop_ClickAsync(object sender, EventArgs e)
         {
+            //CancellationTokenSource tokenSource = null;
+
             if (!string.Equals(btnStartStop.Tag.ToString(), "start", StringComparison.OrdinalIgnoreCase))
             {
+                _logger.Info("Stopping screen cast...");
+                _isStarted = false;
                 btnStartStop.Text = "Start Cast";
                 btnStartStop.Tag = "start";
-                _logger.Info("Screen cast stopped");
+                //tokenSource?.Cancel();
 
                 return;
             }
-
-            GetScreenImage();
 
             try
             {
                 _logger.Info("Starting cast...");
                 btnStartStop.Text = "Stop Cast";
                 btnStartStop.Tag = "stop";
-                //await start
+
+                StartServer();
+
+                _isStarted = true;
+                await StartScreenCapture();
+
+                //tokenSource = new CancellationTokenSource();
+                //CancellationToken cancelToken = tokenSource.Token;
+
+                //var task = Task.Run(async () =>
+                //{
+                //    cancelToken.ThrowIfCancellationRequested();
+
+                //    while (true)
+                //    {
+                //        GetScreenImage();
+                //        cancelToken.ThrowIfCancellationRequested();
+                //        await Task.Delay(40);
+                //    }
+
+                //}, tokenSource.Token);
+
+                //try
+                //{
+                //    await task;
+                //}
+                //catch (OperationCanceledException cancEx)
+                //{
+                //    _logger.Info(cancEx, "Task canceled. Details: {0}", cancEx.Message);
+                //}
+                //finally
+                //{
+                //    tokenSource.Dispose();
+                //}
             }
             catch (Exception ex)
             {
@@ -64,21 +100,18 @@ namespace CastScreenServer
             }
         }
 
-        private void GetScreenImage()
+        private async Task StartScreenCapture()
         {
-            var screenImage = ScreenCaptureHelper.CaptureScreen(Screen.PrimaryScreen.Bounds, true);
-            screenImage.Save(_capturedScreen, System.Drawing.Imaging.ImageFormat.Png);
+            while (_isStarted)
+            {
+                var screenImage = ScreenCaptureHelper.CaptureScreen(Screen.PrimaryScreen.Bounds, true);
+                screenImage.Save(_capturedScreen, System.Drawing.Imaging.ImageFormat.Png);
+            }
 
             //using (var file = new System.IO.FileStream(@"C:\Users\PRNC\workspace\screen.png", FileMode.Create, FileAccess.Write))
             //{
             //    screenImage.Save(file, System.Drawing.Imaging.ImageFormat.Png);
             //}
-            
-        }
-
-        private async Task LoopCaptureScreen()
-        {
-            while
         }
     }
 }
