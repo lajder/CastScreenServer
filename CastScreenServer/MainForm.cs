@@ -5,67 +5,80 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using ScreenRecorderLib;
 
 namespace CastScreenServer
 {
     public partial class MainForm : Form
     {
-        private RecorderOptions _recOptions;
-        private Recorder _recorder;
-        private Stream _outStream;
+        public static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+
+        private object _locker = new object();
+        private ReaderWriterLock _rwLocker = new ReaderWriterLock();
+        private MemoryStream _capturedScreen = new MemoryStream();
+
+        private HttpListener screenCastServer = new HttpListener();
 
         public MainForm()
         {
             InitializeComponent();
 
-            _recOptions = new RecorderOptions
+            this.FormClosed += MainForm_FormClosed;
+
+            _logger.Info("app started");
+        }
+
+        private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            NLog.LogManager.Shutdown();
+        }
+
+        private void btnStartStop_ClickAsync(object sender, EventArgs e)
+        {
+            if (!string.Equals(btnStartStop.Tag.ToString(), "start", StringComparison.OrdinalIgnoreCase))
             {
-                RecorderMode = RecorderMode.Video,
-                IsThrottlingDisabled = false,
-                IsHardwareEncodingEnabled = true,
-                IsLowLatencyEnabled = true,
-                IsMp4FastStartEnabled = true,
-                IsFragmentedMp4Enabled = true,
-                AudioOptions = new AudioOptions
-                {
-                    Bitrate = AudioBitrate.bitrate_96kbps,
-                    Channels = AudioChannels.Mono,
-                    IsAudioEnabled = true
-                },
-                VideoOptions = new VideoOptions
-                {
-                    BitrateMode = BitrateControlMode.UnconstrainedVBR,
-                    Bitrate = 4000 * 1000,
-                    Framerate = 30,
-                    IsFixedFramerate = false,
-                    EncoderProfile = H264Profile.Main
-                },
-                MouseOptions = new MouseOptions
-                {
-                    IsMouseClicksDetected = true,
-                    IsMousePointerEnabled = true,
-                    MouseClickDetectionMode = MouseDetectionMode.Polling
-                },
-                DisplayOptions = new DisplayOptions
-                {
-                    MonitorDeviceName = System.Windows.Forms.Screen.PrimaryScreen.DeviceName
-                }
-            };
+                btnStartStop.Text = "Start Cast";
+                btnStartStop.Tag = "start";
+                _logger.Info("Screen cast stopped");
 
-            _recorder = Recorder.CreateRecorder(_recOptions);
+                return;
+            }
+
+            GetScreenImage();
+
+            try
+            {
+                _logger.Info("Starting cast...");
+                btnStartStop.Text = "Stop Cast";
+                btnStartStop.Tag = "stop";
+                //await start
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Can't start casting. Details: {0}", ex.Message);
+                throw;
+            }
         }
 
-        private void btnStartStop_Click(object sender, EventArgs e)
+        private void GetScreenImage()
         {
+            var screenImage = ScreenCaptureHelper.CaptureScreen(Screen.PrimaryScreen.Bounds, true);
+            screenImage.Save(_capturedScreen, System.Drawing.Imaging.ImageFormat.Png);
 
+            //using (var file = new System.IO.FileStream(@"C:\Users\PRNC\workspace\screen.png", FileMode.Create, FileAccess.Write))
+            //{
+            //    screenImage.Save(file, System.Drawing.Imaging.ImageFormat.Png);
+            //}
+            
         }
 
-        private void GetScreenVideo()
+        private async Task LoopCaptureScreen()
         {
+            while
         }
     }
 }

@@ -79,9 +79,10 @@
             this.btnStartStop.Name = "btnStartStop";
             this.btnStartStop.Size = new System.Drawing.Size(75, 23);
             this.btnStartStop.TabIndex = 5;
+            this.btnStartStop.Tag = "start";
             this.btnStartStop.Text = "Start Cast";
             this.btnStartStop.UseVisualStyleBackColor = true;
-            this.btnStartStop.Click += new System.EventHandler(this.btnStartStop_Click);
+            this.btnStartStop.Click += new System.EventHandler(this.btnStartStop_ClickAsync);
             // 
             // MainForm
             // 
