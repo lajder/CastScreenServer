@@ -19,4 +19,13 @@
     <PackageReference Include="NLog.Config" Version="4.6.8" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="WebServer\bootstrap.min.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="WebServer\index.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

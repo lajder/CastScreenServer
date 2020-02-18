@@ -31,8 +31,6 @@
             this.cbInterface = new System.Windows.Forms.ComboBox();
             this.numPort = new System.Windows.Forms.NumericUpDown();
             this.txtURL = new System.Windows.Forms.TextBox();
-            this.txtUser = new System.Windows.Forms.TextBox();
-            this.txtPass = new System.Windows.Forms.TextBox();
             this.btnStartStop = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.numPort)).BeginInit();
             this.SuspendLayout();
@@ -42,15 +40,25 @@
             this.cbInterface.FormattingEnabled = true;
             this.cbInterface.Location = new System.Drawing.Point(55, 74);
             this.cbInterface.Name = "cbInterface";
-            this.cbInterface.Size = new System.Drawing.Size(121, 23);
+            this.cbInterface.Size = new System.Drawing.Size(282, 23);
             this.cbInterface.TabIndex = 0;
             // 
             // numPort
             // 
-            this.numPort.Location = new System.Drawing.Point(202, 74);
+            this.numPort.Location = new System.Drawing.Point(361, 75);
+            this.numPort.Maximum = new decimal(new int[] {
+            9999,
+            0,
+            0,
+            0});
             this.numPort.Name = "numPort";
-            this.numPort.Size = new System.Drawing.Size(120, 23);
+            this.numPort.Size = new System.Drawing.Size(49, 23);
             this.numPort.TabIndex = 1;
+            this.numPort.Value = new decimal(new int[] {
+            8546,
+            0,
+            0,
+            0});
             // 
             // txtURL
             // 
@@ -58,20 +66,6 @@
             this.txtURL.Name = "txtURL";
             this.txtURL.Size = new System.Drawing.Size(242, 23);
             this.txtURL.TabIndex = 2;
-            // 
-            // txtUser
-            // 
-            this.txtUser.Location = new System.Drawing.Point(170, 230);
-            this.txtUser.Name = "txtUser";
-            this.txtUser.Size = new System.Drawing.Size(100, 23);
-            this.txtUser.TabIndex = 3;
-            // 
-            // txtPass
-            // 
-            this.txtPass.Location = new System.Drawing.Point(328, 230);
-            this.txtPass.Name = "txtPass";
-            this.txtPass.Size = new System.Drawing.Size(100, 23);
-            this.txtPass.TabIndex = 4;
             // 
             // btnStartStop
             // 
@@ -89,11 +83,9 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(674, 437);
-            this.Controls.Add(this.btnStartStop);
-            this.Controls.Add(this.txtPass);
-            this.Controls.Add(this.txtUser);
-            this.Controls.Add(this.txtURL);
             this.Controls.Add(this.numPort);
+            this.Controls.Add(this.btnStartStop);
+            this.Controls.Add(this.txtURL);
             this.Controls.Add(this.cbInterface);
             this.Name = "MainForm";
             this.Text = "CastScreenServer";
@@ -108,8 +100,6 @@
         private System.Windows.Forms.ComboBox cbInterface;
         private System.Windows.Forms.NumericUpDown numPort;
         private System.Windows.Forms.TextBox txtURL;
-        private System.Windows.Forms.TextBox txtUser;
-        private System.Windows.Forms.TextBox txtPass;
         private System.Windows.Forms.Button btnStartStop;
     }
 }

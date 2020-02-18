@@ -1,0 +1,39 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+
+<body>
+    <canvas id="gameCanvas" width="800px" height="600px"></canvas>
+    <script type="text/javascript">
+        var canvas = document.getElementById('gameCanvas');
+        var context = canvas.getContext('2d');
+        var myImage = new Image();
+        var myImage.onload = function () { init(); };
+        var myImage.src = 'Screen.jpg';
+        var imageX = 0, imageY = 0;
+
+        function render() {
+            window.requestAnimationFrame(render);
+
+            // clear canvas
+            canvas.width = canvas.width;
+
+            context.drawImage(myImage, imageX, imageY);
+
+            imageX++;
+            imageY++;
+        }
+
+        function init() {
+            window.requestAnimationFrame(render);
+        }
+    </script>
+</body>
+
+</html>
