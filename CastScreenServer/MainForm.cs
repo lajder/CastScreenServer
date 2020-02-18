@@ -20,7 +20,8 @@ namespace CastScreenServer
         private bool _isStarted;
         private object _locker = new object();
         private ReaderWriterLock _rwLocker = new ReaderWriterLock();
-        private MemoryStream _capturedScreen = new MemoryStream();
+        //private MemoryStream _memoryStream = new MemoryStream();
+        byte[] _capturedScreen;
 
         private HttpListener _screenCastServer = new HttpListener();
 
@@ -76,8 +77,6 @@ namespace CastScreenServer
                 Task[] tasks = new Task[2];
                 tasks[0] = Task.Run(StartScreenCapture);
                 tasks[1] = Task.Run(ListenHttpRequests);
-
-                Task.WaitAll(tasks);
 
                 //tokenSource = new CancellationTokenSource();
                 //CancellationToken cancelToken = tokenSource.Token;
@@ -156,17 +155,19 @@ namespace CastScreenServer
 
                 if (requestPath.Contains("screen"))
                 {
-                    responseData = _capturedScreen.ToArray();
+                    responseData = _capturedScreen;
                 }
                 else if (requestPath.Contains("bootstrap"))
                 {
-                    string pagePath = Path.Combine(Application.StartupPath, "Webserver", requestPath);
+                    string pagePath = Path.Combine(Application.StartupPath, "Webserver", "bootstrap.min.css");
                     responseData = File.ReadAllBytes(pagePath);
+                    context.Response.ContentType = "text/css";
                 }
                 else if (requestPath == "/")
                 {
                     string pagePath = Path.ChangeExtension(Path.Combine(Application.StartupPath, "Webserver", "index"), "html");
                     responseData = File.ReadAllBytes(pagePath);
+                    context.Response.ContentType = "text/html";
                 }
 
                 context.Response.StatusCode = 200;
@@ -188,7 +189,13 @@ namespace CastScreenServer
             while (_isStarted)
             {
                 var screenImage = ScreenCaptureHelper.CaptureScreen(Screen.PrimaryScreen.Bounds, true);
-                screenImage.Save(_capturedScreen, System.Drawing.Imaging.ImageFormat.Png);
+
+                using (var stream = new MemoryStream())
+                {
+                    screenImage.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+                    _capturedScreen = stream.ToArray();
+                }
+
                 await Task.Delay(40);
             }
 

@@ -9,30 +9,14 @@
 </head>
 
 <body>
-    <canvas id="gameCanvas" width="800px" height="600px"></canvas>
+    <img id="imgPrev" src="screen.png" class="img-fluid" alt="Screen Cast" />
     <script type="text/javascript">
-        var canvas = document.getElementById('gameCanvas');
-        var context = canvas.getContext('2d');
-        var myImage = new Image();
-        var myImage.onload = function () { init(); };
-        var myImage.src = 'Screen.jpg';
-        var imageX = 0, imageY = 0;
+        var refreshInterval = 40;
 
-        function render() {
-            window.requestAnimationFrame(render);
-
-            // clear canvas
-            canvas.width = canvas.width;
-
-            context.drawImage(myImage, imageX, imageY);
-
-            imageX++;
-            imageY++;
-        }
-
-        function init() {
-            window.requestAnimationFrame(render);
-        }
+        var timer = setInterval(function () {
+            var ImagePreview = document.getElementById('imgPrev');
+            ImagePreview.src = 'screen.png?rand=' + Math.random();
+        }, refreshInterval);
     </script>
 </body>
 
