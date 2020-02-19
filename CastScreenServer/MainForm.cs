@@ -17,11 +17,10 @@ namespace CastScreenServer
     {
         public static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
+        private bool _autoStart = false;
         private bool _isStarted;
-        private object _locker = new object();
-        private ReaderWriterLock _rwLocker = new ReaderWriterLock();
-        //private MemoryStream _memoryStream = new MemoryStream();
-        byte[] _capturedScreen;
+        private byte[] _capturedScreen;
+        private string[] _startArgs;
 
         private HttpListener _screenCastServer = new HttpListener();
 
@@ -31,21 +30,57 @@ namespace CastScreenServer
         {
             InitializeComponent();
 
+            this.FormClosed += MainForm_FormClosed;
+            this.Load += MainForm_Load;
+
             _netInterfaces = GetNetworkInterfaces();
+
             foreach (var netInter in _netInterfaces)
             {
                 cbInterface.Items.Add(netInter.Item2 + " - " + netInter.Item1);
             }
             cbInterface.SelectedIndex = 0;
-            //cbInterface.SelectedIndex = cbInterface.Items.Count - 1;
 
+            try
+            {
+                _startArgs = Environment.GetCommandLineArgs();
+                if (_startArgs.Length > 2)
+                {
+                    string customIP = _startArgs[1];
+                    string customPort = _startArgs[2];
 
-            this.FormClosed += MainForm_FormClosed;
+                    System.Text.RegularExpressions.Regex ipAddrRegex = new System.Text.RegularExpressions.Regex(@"\b(?:(?:2(?:[0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9])\.){3}(?:(?:2([0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9]))\b");
+                    System.Text.RegularExpressions.Regex portRegex = new System.Text.RegularExpressions.Regex(@"\d{2,4}");
+                    if (!ipAddrRegex.IsMatch(customIP)) throw new Exception("Invalid IP adress format");
+                    if (!portRegex.IsMatch(customPort)) throw new Exception("Invalid Port number format");
+
+                    decimal decPortNumber = Convert.ToDecimal(customPort);
+                    numPort.Value = decPortNumber;
+
+                    var customInterface = Tuple.Create("custom", customIP);
+                    _netInterfaces.Add(customInterface);
+                    cbInterface.Items.Add(customInterface.Item2 + " - " + customInterface.Item1);
+                    cbInterface.SelectedIndex = cbInterface.Items.Count - 1;
+
+                    _autoStart = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Warn(ex, "Can't get command line arguments. Details: {0}", ex.Message);
+            }
+            
             _logger.Info("app started");
+        }
+
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+            if (_autoStart) btnStartStop_ClickAsync(this, new EventArgs());
         }
 
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
         {
+            _screenCastServer.Close();
             NLog.LogManager.Shutdown();
         }
 
@@ -59,6 +94,7 @@ namespace CastScreenServer
                 _isStarted = false;
                 btnStartStop.Text = "Start Cast";
                 btnStartStop.Tag = "start";
+                //_screenCastServer.Stop();
                 //tokenSource?.Cancel();
 
                 return;
@@ -192,17 +228,12 @@ namespace CastScreenServer
 
                 using (var stream = new MemoryStream())
                 {
-                    screenImage.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+                    screenImage.Save(stream, System.Drawing.Imaging.ImageFormat.Jpeg);
                     _capturedScreen = stream.ToArray();
                 }
 
                 await Task.Delay(40);
             }
-
-            //using (var file = new System.IO.FileStream(@"C:\Users\PRNC\workspace\screen.png", FileMode.Create, FileAccess.Write))
-            //{
-            //    screenImage.Save(file, System.Drawing.Imaging.ImageFormat.Png);
-            //}
         }
     }
 }

@@ -4,20 +4,45 @@
 
 <head>
     <link rel="stylesheet" href="bootstrap.min.css">
+    <style>
+        #screenCanvas {
+            width: 100%;
+        }
+    </style>
     <meta charset="utf-8" />
     <title></title>
 </head>
 
-<body>
-    <img id="imgPrev" src="screen.png" class="img-fluid" alt="Screen Cast" />
-    <script type="text/javascript">
-        var refreshInterval = 40;
+<body onload="JavaScript:timedRefresh();">
+    <!--<img id="imgPrev" src="screen.jpg" class="img-fluid" alt="Screen Cast" />-->
 
-        var timer = setInterval(function () {
-            var ImagePreview = document.getElementById('imgPrev');
-            ImagePreview.src = 'screen.png?rand=' + Math.random();
-        }, refreshInterval);
+    <script type="text/javascript">
+        var refreshInterval = 70;
+
+        //var timer = setInterval(function () {
+        //    var ImagePreview = document.getElementById('imgPrev');
+        //    ImagePreview.src = 'screen.jpg?rand=' + Math.random();
+        //}, refreshInterval);
+
+        var img = new Image();
+        img.onload = function () {
+            var canvas = document.getElementById("screenCanvas");
+            var heightRatio = 9/16;
+            canvas.height = canvas.width * heightRatio;
+
+            var context = canvas.getContext("2d");
+            context.drawImage(img, 0, 0, canvas.width, canvas.height);
+            setTimeout(timedRefresh, refreshInterval);
+        };
+
+        function timedRefresh() {
+            img.src = 'screen.jpg?rand=' + Math.random();
+        };
+
     </script>
+
+    <canvas id="screenCanvas" width="1920" height="1080"></canvas>
+
 </body>
 
 </html>

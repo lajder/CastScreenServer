@@ -5,6 +5,11 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <Platforms>AnyCPU;x64</Platforms>
+    <Authors>Piotr Nowicki</Authors>
+    <Product />
+    <PackageProjectUrl>https://github.com/lajder/CastScreenServer</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/lajder/CastScreenServer</RepositoryUrl>
+    <RepositoryType>GIT</RepositoryType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -20,6 +25,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="ReadMe.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="WebServer\bootstrap.min.css">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
