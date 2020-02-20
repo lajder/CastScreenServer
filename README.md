@@ -7,3 +7,9 @@ Aplikacja do przechwytywania zawartości ekranu i udostępnia jej przez utworzon
 * .NET Core 3.1
 * zasada firewall pozwalająca na komunikację na odpowiednim porcie
 * dodany wpis do znanych adresów HTTP dla danego użytkownika lub uprawnienia administratora do uruchomienia aplikacji (ograniczenia Windows dla HTTPListener)
+
+# Dokumentacja
+https://github.com/lajder/CastScreenServer/blob/master/CastScreenServer%20documentation.pdf
+
+# Pobranie aplikacji
+https://github.com/lajder/CastScreenServer/blob/master/CastScreenServer/Download/CastScreenServer-1.0.0.zip
